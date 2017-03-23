@@ -4,6 +4,12 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 
+var MongoClient = require('mongodb').MongoClient;
+var assert = require('assert');
+
+// Connection URL
+var url = 'mongodb://localhost:27017/myproject';
+
 function logRequest(req, res, next) {
     console.log('incoming request at ', new Date());
     next();
@@ -19,15 +25,27 @@ app.use(logRequest);
 app.use(auth);
 app.use(bodyParser.json());
 
+
+
 app.get('/', function (req, res) {
-    res.send('Hello World!');
+// Use connect method to connect to the server
+    MongoClient.connect(url, function (err, db) {
+        assert.equal(null, err);
+        res.send("Connected successfully to server");
+
+        db.close();
+    });
+
+    //res.send('Hello World!');
+
+
 });
 
-app.get('/error', function(req, res) {
+app.get('/error', function (req, res) {
     throw new Error('forced error');
 });
 
-app.post('/stock', function(req, res, next) {
+app.post('/stock', function (req, res, next) {
     res.json({
         isbn: req.body.isbn,
         count: req.body.count
@@ -47,7 +65,7 @@ function serverError(err, req, res, next) {
     var status = err.status || 500;
     res.status(status);
     console.error(err.stack);
-    res.send('Oh no: '+ status);
+    res.send('Oh no: ' + status);
 }
 
 module.exports = app
