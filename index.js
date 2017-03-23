@@ -10,6 +10,11 @@ var assert = require('assert');
 // Connection URL
 var url = 'mongodb://localhost:27017/myproject';
 
+var connPromise = MongoClient.connect(url);
+var collectionPromise = connPromise.then(function (db) {
+    return db.collection('books');
+});
+
 function logRequest(req, res, next) {
     console.log('incoming request at ', new Date());
     next();
@@ -42,11 +47,10 @@ app.get('/error', function (req, res) {
 app.post('/stock', function (req, res, next) {
     var isbn = req.body.isbn;
     var count = req.body.count;
-    
-    MongoClient.connect(url, function (err, db) {
-        assert.equal(null, err);
-        //res.send("Connected successfully to server");
-        db.collection('books').updateOne({
+
+    collectionPromise.then(function (collection) {
+
+        collection.updateOne({
             isbn: isbn
         }, {
             isbn: isbn,
@@ -54,20 +58,25 @@ app.post('/stock', function (req, res, next) {
         }, {
             upsert: true
         });
-        db.close();
+
+    }).then(function () {
+        res.json({
+            isbn: req.body.isbn,
+            count: req.body.count
+
+        });
+
     });
-    res.json({
-        isbn: req.body.isbn,
-        count: req.body.count
-    });
+
+
 });
 
-app.get('/stock', function (req, res) {
-    MongoClient.connect(url, function (err, db) {
-        db.collection('books').find({}).toArray(function(err,docs){
-            res.send(docs);
-        });
-    });
+app.get('/stock', function (req, res, next) {
+    collectionPromise.then(function (collection) {
+        return collection.find({}).toArray();
+    }).then(function(results) {
+        res.send(results);
+    }).catch(next);
 });
 
 
