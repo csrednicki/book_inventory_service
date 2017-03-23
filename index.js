@@ -37,10 +37,6 @@ app.post('/stock', function(req, res, next) {
 app.use(clientError);
 app.use(serverError);
 
-app.listen(3000, function () {
-    console.log('Example app listening on port 3000!');
-});
-
 function clientError(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
@@ -53,3 +49,5 @@ function serverError(err, req, res, next) {
     console.error(err.stack);
     res.send('Oh no: '+ status);
 }
+
+module.exports = app
