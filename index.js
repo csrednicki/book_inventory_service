@@ -56,6 +56,22 @@ app.get('/stock', function (req, res, next) {
 
 });
 
+app.get('/stock/:isbn', function (req, res, next) {
+    
+    console.log('params', req.params);
+    
+    stockRepository.find(parseInt(req.params.isbn)).then(function(results) {
+        
+        if(results.length > 0) {
+            res.json(results);
+        } else {
+            res.send('Brak rekordow');
+        }
+        
+    }).catch(next);
+    
+});
+
 
 app.use(clientError);
 app.use(serverError);
@@ -73,4 +89,4 @@ function serverError(err, req, res, next) {
     res.send('Oh no: ' + status);
 }
 
-module.exports = app
+module.exports = app;
