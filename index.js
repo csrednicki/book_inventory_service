@@ -29,14 +29,8 @@ app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
 // Use connect method to connect to the server
-    MongoClient.connect(url, function (err, db) {
-        assert.equal(null, err);
-        res.send("Connected successfully to server");
 
-        db.close();
-    });
-
-    //res.send('Hello World!');
+    res.send('Hello World!');
 
 
 });
@@ -46,11 +40,36 @@ app.get('/error', function (req, res) {
 });
 
 app.post('/stock', function (req, res, next) {
+    var isbn = req.body.isbn;
+    var count = req.body.count;
+    
+    MongoClient.connect(url, function (err, db) {
+        assert.equal(null, err);
+        //res.send("Connected successfully to server");
+        db.collection('books').updateOne({
+            isbn: isbn
+        }, {
+            isbn: isbn,
+            count: count
+        }, {
+            upsert: true
+        });
+        db.close();
+    });
     res.json({
         isbn: req.body.isbn,
         count: req.body.count
     });
 });
+
+app.get('/stock', function (req, res) {
+    MongoClient.connect(url, function (err, db) {
+        db.collection('books').find({}).toArray(function(err,docs){
+            res.send(docs);
+        });
+    });
+});
+
 
 app.use(clientError);
 app.use(serverError);
