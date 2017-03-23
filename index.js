@@ -3,17 +3,7 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
-
-var MongoClient = require('mongodb').MongoClient;
-var assert = require('assert');
-
-// Connection URL
-var url = 'mongodb://localhost:27017/myproject';
-
-var connPromise = MongoClient.connect(url);
-var collectionPromise = connPromise.then(function (db) {
-    return db.collection('books');
-});
+var stockRepository = require('./stockRepository');
 
 function logRequest(req, res, next) {
     console.log('incoming request at ', new Date());
@@ -48,35 +38,22 @@ app.post('/stock', function (req, res, next) {
     var isbn = req.body.isbn;
     var count = req.body.count;
 
-    collectionPromise.then(function (collection) {
-
-        collection.updateOne({
-            isbn: isbn
-        }, {
-            isbn: isbn,
-            count: count
-        }, {
-            upsert: true
-        });
-
-    }).then(function () {
+    stockRepository.stockUp(isbn, count).then(function () {
         res.json({
             isbn: req.body.isbn,
             count: req.body.count
 
         });
-
-    });
+    }).catch(next);
 
 
 });
 
 app.get('/stock', function (req, res, next) {
-    collectionPromise.then(function (collection) {
-        return collection.find({}).toArray();
-    }).then(function(results) {
-        res.send(results);
+    stockRepository.findAll().then(function (results) {
+        res.json(results);
     }).catch(next);
+
 });
 
 
