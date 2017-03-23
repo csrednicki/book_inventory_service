@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var bodyParser = require('body-parser');
 
 function logRequest(req, res, next) {
     console.log('incoming request at ', new Date());
@@ -14,6 +15,7 @@ function auth(req, res, next) {
 
 app.use(logRequest);
 app.use(auth);
+app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
     res.send('Hello World!');
@@ -21,6 +23,13 @@ app.get('/', function (req, res) {
 
 app.get('/error', function(req, res) {
     throw new Error('forced error');
+});
+
+app.post('/stock', function(req, res, next) {
+    res.json({
+        isbn: req.body.isbn,
+        count: req.body.count
+    });
 });
 
 app.use(clientError);
