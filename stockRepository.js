@@ -12,7 +12,7 @@ module.exports = {
         return collectionPromise.then(function (collection) {
             return collection.updateOne({isbn: isbn},
                 {isbn: isbn, count: count}, {upsert: true});
-        })
+        });
     },
     findAll: function () {
         return collectionPromise.then(function (collection) {

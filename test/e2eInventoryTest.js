@@ -1,5 +1,6 @@
 var request = require('supertest');
-var app = require('../index');
+var inMemoryRepo = require('../stockInMemory');
+var app = require('../index')(inMemoryRepo);
 
 describe('Book inventory', function () {
     it('allows to stock up the items', function () {
