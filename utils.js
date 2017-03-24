@@ -1,22 +1,22 @@
 module.exports = {
 
-    logRequest: function(req, res, next) {
+    logRequest(req, res, next) {
         console.log('incoming request at ', new Date());
         next();
     },
 
-    auth: function (req, res, next) {
+    auth(req, res, next) {
         console.log('you can pass my auth');
         next();
     },
 
-    clientError: function (req, res, next) {
+    clientError(req, res, next) {
         var err = new Error('Not Found');
         err.status = 404;
         next(err);
     },
 
-    serverError: function (err, req, res, next) {
+    serverError(err, req, res, next) {
         var status = err.status || 500;
         res.status(status);
         console.error(err.stack);

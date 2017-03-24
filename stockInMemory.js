@@ -2,10 +2,10 @@ module.exports = function() {
     var items = [];
 
     return {
-        _items: function(state) {
+        _items(state) {
             items = state;
         },
-        stockUp: function (isbn, count) {
+        stockUp(isbn, count) {
             var updated = false;
             items.forEach(function(item) {
                 if(item.isbn === isbn) {
@@ -18,10 +18,10 @@ module.exports = function() {
             }
             return Promise.resolve();
         },
-        findAll: function () {
+        findAll() {
             return Promise.resolve(items);
         },
-        getCount: function (isbn) {
+        getCount(isbn) {
             var foundItemCount = null;
             items.forEach(function(item) {
                 if(item.isbn === isbn) {

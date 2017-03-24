@@ -1,13 +1,13 @@
 module.exports = function (stockRepository) {
 
     return {
-        hello: function (req, res) {
+        hello(req, res) {
             res.send('Hello World!');
         },
-        error: function (req, res) {
+        error(req, res) {
             throw new Error('forced error');
         },
-        stockUp: function (req, res, next) {
+        stockUp(req, res, next) {
             var isbn = req.body.isbn;
             var count = req.body.count;
 
@@ -19,23 +19,44 @@ module.exports = function (stockRepository) {
                 });
             }).catch(next);
         },
-        getStock: function (req, res, next) {
+        getStock(req, res, next) {
+            
             stockRepository.findAll().then(function (results) {
-                res.json(results);
+
+                res.format({
+                  html: function(){
+                    res.send('<p>Stan inwentarza: '+results.length+'</p>');
+                  },
+
+                  json: function(){
+                    res.send(results);
+                  }
+                });
+                
             }).catch(next);
 
         },
-        find: function (req, res, next) {
+        find(req, res, next) {
 
             console.log('params', req.params);
 
             stockRepository.find(parseInt(req.params.isbn)).then(function (results) {
 
                 if (results.length > 0) {
-                    res.json(results);
+                    result = results;
                 } else {
-                    res.send('Brak rekordow');
+                    result = null;
                 }
+
+                res.format({
+                  html: function(){
+                    res.send('<p>HTML</p>');
+                  },
+
+                  json: function(){
+                    res.send(result);
+                  }
+                });
 
             }).catch(next);
 
