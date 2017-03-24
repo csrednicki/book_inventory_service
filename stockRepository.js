@@ -1,10 +1,10 @@
 var MongoClient = require('mongodb').MongoClient;
 
-var url = 'mongodb://localhost:27017/myproject';
+var url = process.env.MONGODB_URI || 'mongodb://localhost:27017/myproject';
 
 var connectionPromise = MongoClient.connect(url, {bufferMaxEntries: 0});
 var collectionPromise = connectionPromise.then(function (db) {
-    return db.collection('books');
+    return db.collection('books-cs');
 });
 
 module.exports = {
